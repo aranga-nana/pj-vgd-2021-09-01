@@ -55,7 +55,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
            key.setInvocations(1);
            key.setUpdated(new Date());
         }
-        repository.update(key);
+        repository.save(key);
         return new OutputResult().withSuccess(true);
     }
 

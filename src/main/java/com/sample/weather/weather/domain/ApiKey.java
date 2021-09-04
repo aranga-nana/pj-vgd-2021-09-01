@@ -1,10 +1,20 @@
 package com.sample.weather.weather.domain;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity(name = "api_key")
 public class ApiKey {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
+
     private String email;
+
+    @Column(name = "api_key",unique = true)
     private String key;
+
     private Date updated;
     private int invocations;
 
@@ -38,5 +48,13 @@ public class ApiKey {
 
     public void setInvocations(int invocations) {
         this.invocations = invocations;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
