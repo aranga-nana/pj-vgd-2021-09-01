@@ -1,4 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./h2-db/weather
+  h2:
+    console:
+      enabled: true
+
 application:
   throttle: 5
+  weatherMapApiKey: ${WEATHER_API_KEY:"add api key"}
+  ttl: 5
 
 

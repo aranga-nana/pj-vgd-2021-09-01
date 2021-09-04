@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "application",ignoreUnknownFields = true)
 public class ApplicationProperties {
 
+    private Integer throttle;
+    private String weatherMapApiKey;
+
     public Integer getThrottle() {
         return throttle;
     }
@@ -15,9 +18,13 @@ public class ApplicationProperties {
         this.throttle = throttle;
     }
 
-    private Integer throttle;
+    public String getWeatherMapApiKey() {
+        return weatherMapApiKey;
+    }
 
-
+    public void setWeatherMapApiKey(String weatherMapApiKey) {
+        this.weatherMapApiKey = weatherMapApiKey;
+    }
 
     @Override
     public String toString() {

@@ -1,4 +1,4 @@
 application:
   throttle: 5
-
-
+  weatherMapApiKey: ${WRATHER_API_KEY:"add api key"}
+  ttl: 5

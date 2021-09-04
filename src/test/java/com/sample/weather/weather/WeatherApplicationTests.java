@@ -15,6 +15,7 @@ class WeatherApplicationTests {
 	@Test
 	void contextLoadsAndConfig() {
 		Assert.assertEquals(5,applicationProperties.getThrottle().intValue());
+		Assert.assertNotNull(applicationProperties.getWeatherMapApiKey());
 	}
 
 }
