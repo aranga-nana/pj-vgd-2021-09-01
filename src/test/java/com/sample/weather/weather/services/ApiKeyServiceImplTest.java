@@ -70,7 +70,8 @@ class ApiKeyServiceImplTest {
         doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
 
         OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
-        Assert.assertFalse(valid.isSuccess());
+        Assert.assertTrue(valid.isSuccess());
+
     }
 
 
