@@ -61,7 +61,7 @@ class ApiKeyServiceImplTest {
 
         // make  minute than current time => 1st invocation after reset
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE,-55); // 55 minute beforen current time (1st invocation)
+        calendar.add(Calendar.MINUTE,-55); // 55 minute beforen current time (1st invocation)
 
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(4);
@@ -74,6 +74,22 @@ class ApiKeyServiceImplTest {
 
     }
 
+    @Test
+    void validateThrottleRest() {
+        // create key which 1 invocation done in 1 hour go throttle maxed;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR,-1);
+        calendar.add(Calendar.MINUTE,-2);
+        logger.info("{}",calendar.getTime());
+        ApiKey mockKey = new ApiKey();
+        mockKey.setInvocations(5);
+        mockKey.setUpdated(calendar.getTime());
+        mockKey.setKey("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
+        OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        Assert.assertTrue(valid.isSuccess());
+
+    }
 
     @Test
     void validateThrottleFailed() {
