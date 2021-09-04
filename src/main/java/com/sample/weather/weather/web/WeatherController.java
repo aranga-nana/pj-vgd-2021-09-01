@@ -43,6 +43,9 @@ public class WeatherController {
         if (ErrorCode.notFound.equals(result.getErrorCode())) {
             return ResponseEntity.notFound().build();
         }
+        if (ErrorCode.error.equals(result.getErrorCode())) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.status(500).build();
     }
 }
