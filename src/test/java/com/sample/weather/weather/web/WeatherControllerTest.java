@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import com.sample.weather.weather.common.ErrorCode;
 import com.sample.weather.weather.common.OutputResult;
 import com.sample.weather.weather.services.ApiKeyService;
 import com.sample.weather.weather.services.WeatherService;
@@ -66,8 +67,49 @@ class WeatherControllerTest {
                 .andExpect(jsonPath("$.country",is("Australia")))
                 .andExpect(jsonPath("$.description",is("sunny")));
 
-        Assert.assertTrue(true);
+       // Assert.assertTrue(true);
     }
+    @Test
+    @DisplayName("GET /api/weather/current?country=Australia&city=melbourne&apiKey=12838848 - Throttle ")
+    void testGetWeatherThrottleFail() throws Exception {
+        OutputResult mockApiValidationResult = new OutputResult().withSuccess(false).withErrorCode(ErrorCode.rateExceeded);
 
+        WeatherInfoDTO mockInfo = new WeatherInfoDTO();
+        mockInfo.setCity("Melbourne");
+        mockInfo.setCountry("Australia");
+        mockInfo.setDescription("sunny");
+        OutputResult<WeatherInfoDTO>  mockWeatherResult = new
+                OutputResult<WeatherInfoDTO>().withData(mockInfo).withSuccess(true);
+
+        doReturn(mockApiValidationResult).when(apiKeyService).validate(any());
+        doReturn(mockWeatherResult).when(weatherService).getWeather("Australia","Melbourne");
+        mockMvc.perform(get("/api/weather/current?")
+                .param("country","Australia")
+                .param("city","Melbourne")
+                .param("apiKey","aiweiweie"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(429));
+    }
+    @Test
+    @DisplayName("GET /api/weather/current?country=Australia&city=melbourne&apiKey=12838848 - Invalid api key ")
+    void testGetWeatherInvalidApiFail() throws Exception {
+        OutputResult mockApiValidationResult = new OutputResult().withSuccess(false).withErrorCode(ErrorCode.forbidden);
+
+        WeatherInfoDTO mockInfo = new WeatherInfoDTO();
+        mockInfo.setCity("Melbourne");
+        mockInfo.setCountry("Australia");
+        mockInfo.setDescription("sunny");
+        OutputResult<WeatherInfoDTO>  mockWeatherResult = new
+                OutputResult<WeatherInfoDTO>().withData(mockInfo).withSuccess(true);
+
+        doReturn(mockApiValidationResult).when(apiKeyService).validate(any());
+        doReturn(mockWeatherResult).when(weatherService).getWeather("Australia","Melbourne");
+        mockMvc.perform(get("/api/weather/current?")
+                .param("country","Australia")
+                .param("city","Melbourne")
+                .param("apiKey","aiweiweie"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isForbidden());
+    }
 
 }
