@@ -13,8 +13,8 @@ class WeatherApplicationTests {
 	ApplicationProperties applicationProperties;
 
 	@Test
-	void contextLoads() {
-		Assert.assertEquals(3,applicationProperties.getThrottle().intValue());
+	void contextLoadsAndConfig() {
+		Assert.assertEquals(5,applicationProperties.getThrottle().intValue());
 	}
 
 }
