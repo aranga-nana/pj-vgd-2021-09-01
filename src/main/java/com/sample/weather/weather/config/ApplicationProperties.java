@@ -9,6 +9,7 @@ public class ApplicationProperties {
 
     private Integer throttle;
     private String weatherMapApiKey;
+    private Integer ttl;
 
     public Integer getThrottle() {
         return throttle;
@@ -24,6 +25,14 @@ public class ApplicationProperties {
 
     public void setWeatherMapApiKey(String weatherMapApiKey) {
         this.weatherMapApiKey = weatherMapApiKey;
+    }
+
+    public Integer getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(Integer ttl) {
+        this.ttl = ttl;
     }
 
     @Override

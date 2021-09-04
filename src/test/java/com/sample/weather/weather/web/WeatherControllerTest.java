@@ -85,7 +85,7 @@ class WeatherControllerTest {
                 .andExpect(status().is(429));
     }
     @Test
-    @DisplayName("GET /api/weather/current?country=Australia&city=melbourne&apiKey=12838848 - Invalid api key ")
+    @DisplayName("GET /api/weather/current?country=Australia&city=melbourne&apiKey=12838848 - Invalid api key => forbidden")
     void testGetWeatherInvalidApiFail() throws Exception {
         OutputResult mockApiValidationResult = new OutputResult().withSuccess(false).withErrorCode(ErrorCode.forbidden);
 
@@ -105,5 +105,23 @@ class WeatherControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isForbidden());
     }
+    @Test
+    @DisplayName("GET /api/weather/current?apiKey=12838848 - empty parameter => BAD REQUEST")
+    void testGetWeatherIBadRequest() throws Exception {
+        OutputResult mockApiValidationResult = new OutputResult().withSuccess(false).withErrorCode(ErrorCode.error);
 
+        WeatherInfoDTO mockInfo = new WeatherInfoDTO();
+        mockInfo.setCity("Melbourne");
+        mockInfo.setCountry("Australia");
+        mockInfo.setDescription("sunny");
+        OutputResult<WeatherInfoDTO>  mockWeatherResult = new
+                OutputResult<WeatherInfoDTO>().withData(mockInfo).withSuccess(true);
+
+        doReturn(mockApiValidationResult).when(apiKeyService).validate(any());
+        doReturn(mockWeatherResult).when(weatherService).getWeather("Australia","Melbourne");
+        mockMvc.perform(get("/api/weather/current?")
+                .param("apiKey","aiweiweie"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isBadRequest());
+    }
 }

@@ -27,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,6 +51,7 @@ class WeatherServiceImplTest {
         mocWeather.setCity("Melbourne");
         mocWeather.setCountry("Australia");
         mocWeather.setDescription("Sunny");
+        mocWeather.setUpdated(new Date());
         doReturn(Optional.of(mocWeather)).when(repository).findByCountryAndCity("Australia", "Melbourne");
 
         OutputResult<WeatherInfoDTO> found = weatherService.getWeather("Australia","Melbourne");
@@ -92,26 +94,19 @@ class WeatherServiceImplTest {
         mocWeather.setDescription("Sunny");
         mocWeather.setUpdated(calendar.getTime()); // expired
 
-        doReturn(mocWeather).when(repository).findByCountryAndCity("Australia", "Sydney");
-        doReturn(Optional.of("Sunny")).when(apiService).getWeatherDescription("Australia", "Sydney");
+        doReturn(Optional.of(mocWeather)).when(repository).findByCountryAndCity("Australia", "Sydney");
+        doReturn(Optional.of("Partly Cloudy")).when(apiService).getWeatherDescription("Australia", "Sydney");
 
         OutputResult<WeatherInfoDTO> found = weatherService.getWeather("Australia","Sydney");
         assertTrue(found.isSuccess());
-        assertEquals("Sunny",found.getData().getDescription());
+        assertEquals("Partly Cloudy",found.getData().getDescription());
     }
     @Test
     @DisplayName("getWeather: from the api service with error - FAILED")
     void getWeatherApiError() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR,-6);
-        Weather mocWeather = new Weather();
-        mocWeather.setCity("Melbourne");
-        mocWeather.setCountry("Australia");
-        mocWeather.setDescription("Sunny");
-        mocWeather.setUpdated(calendar.getTime()); // expired
 
-        doReturn(mocWeather).when(repository).findByCountryAndCity("Australia", "Sydney");
-        doThrow(new IllegalStateException("Invalid api key")).when(apiService).getWeatherDescription("Australia", "Sydney");
+        doReturn(Optional.empty()).when(repository).findByCountryAndCity("Australia", "Sydney");
+        doThrow(IllegalStateException.class).when(apiService).getWeatherDescription("Australia", "Sydney");
 
         OutputResult<WeatherInfoDTO> found = weatherService.getWeather("Australia","Sydney");
         assertFalse(found.isSuccess());
