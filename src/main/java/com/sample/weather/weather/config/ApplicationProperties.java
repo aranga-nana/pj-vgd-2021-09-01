@@ -10,6 +10,7 @@ public class ApplicationProperties {
     private Integer throttle;
     private String weatherMapApiKey;
     private Integer ttl;
+    private String apiBaseUrl;
 
     public Integer getThrottle() {
         return throttle;
@@ -35,10 +36,21 @@ public class ApplicationProperties {
         this.ttl = ttl;
     }
 
+    public String getApiBaseUrl() {
+        return apiBaseUrl;
+    }
+
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl = apiBaseUrl;
+    }
+
     @Override
     public String toString() {
         return "ApplicationProperties{" +
                 "throttle=" + throttle +
+                ", weatherMapApiKey='" + weatherMapApiKey + '\'' +
+                ", ttl=" + ttl +
+                ", apiBaseUrl='" + apiBaseUrl + '\'' +
                 '}';
     }
 }

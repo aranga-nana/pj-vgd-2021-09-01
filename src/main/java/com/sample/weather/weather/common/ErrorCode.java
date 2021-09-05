@@ -5,6 +5,7 @@ public enum  ErrorCode {
     notFound,
     internalServiceError,
     rateExceeded,
-    forbidden
+    forbidden,
+    missingParameterValues
 
 }
