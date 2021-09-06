@@ -34,24 +34,24 @@ key chema:
 <base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 and salt including>
 whole string then been encode as base64. using hash with salt make key tamper protected.
 
-###Initial Data Loading (5 keys)
+### Initial Data Loading (5 keys)
 - they are saved as 5 sql statement in data.sql and getting loaded when application
 started and display on the console. 
  
-###Running Test
+### Running Test
 ```
 export  APPLICATION_WEATHERMAPAPIKEY="openweather api key" or equlent windows command 
 # instead of export you can update application.yml in test/resources with key.
 
 ./mvnw test 
 ```
-###How to Run
+### How to Run
 ```
  ./mvnw  spring-boot:run -Dspring-boot.run.jvmArguments="-Dapplication.weatherMapApiKey=<your api key>"
 
 ```
 or  you can update application.yml and run without -Dspring-boot.run.jvmArguments
-####NOTES
+#### NOTES
 
 - relighting is done in really simple way and wont accurate when have lot of multiple request at time
   need to use distribute in memory couple with with atomic counter type of implementation.  
