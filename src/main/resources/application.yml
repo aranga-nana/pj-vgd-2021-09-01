@@ -1,17 +1,20 @@
 spring:
   jpa:
     hibernate:
-        ddl-auto: create
+        ddl-auto: update
+
 
   datasource:
     url: jdbc:h2:file:./h2-db/weather
     username: sa
     password: password
-    initialize: true
 
   h2:
     console:
       enabled: true
+  sql:
+    init:
+      mode: embedded
 
 application:
   throttle: 5

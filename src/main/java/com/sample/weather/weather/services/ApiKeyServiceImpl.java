@@ -35,7 +35,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     public OutputResult validate(String apiKey) {
-        if (StringUtils.isEmpty(apiKey)) {
+        if (validateApiKey(apiKey)) {
             return FORBIDDEN_STATUS;
         }
         Optional<ApiKey> oKey = repository.findByKey(apiKey);

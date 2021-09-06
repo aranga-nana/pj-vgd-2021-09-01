@@ -25,11 +25,8 @@ public class WeatherController {
         this.apiKeyService = apiKeyService;
     }
     @GetMapping("/weather/current")
-    public ResponseEntity<?> weather(@RequestParam(required = false) String country, @RequestParam(required = false) String city, @RequestParam(required = false) String apiKey) {
+    public ResponseEntity<?> weather(@RequestParam() String country, @RequestParam() String city, @RequestParam(name = "api_key") String apiKey) {
 
-        if (StringUtils.isEmpty(country) || StringUtils.isEmpty(city)) {
-            return ResponseEntity.badRequest().build();
-        }
         final OutputResult valid = apiKeyService.validate(apiKey);
         if (!valid.isSuccess()) {
             if (ErrorCode.rateExceeded.equals(valid.getErrorCode())) {

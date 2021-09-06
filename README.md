@@ -13,11 +13,11 @@ Your service should:
 
 #Design
 Current design based on restful api design which.
-- Transport layer (Rest)
+- Rest Service
   WeatherController which handle the user request. It also responsible for passing
   correct http status code to client 
 - Service Layer
-  Basically logic layer and also interact with other services.
+  Basically act as service/logic layer and also interact with other services.
   ApiKeyService - dealing with api key related logic including key schema and 
   WeatherService - core application logic around the weather service
   OpenWeatherApiService - communicate with external Open Weather Api and provide data 
@@ -26,11 +26,15 @@ Current design based on restful api design which.
   perforce database related operation
   ApiKeyRepository - store for api key
   WeatherRepository - dealing with cache weather information.  
+  
 #####Key Schema design
 use dot notation to devide field into hold following information.
-<base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 parts including>
-whole string then been encode as base64
+<base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 and salt including>
+whole string then been encode as base64. using hash with salt make key tamper protected.
 
+###Initial Data Loading (5 keys)
+- they are saved as 5 sql statement in data.sql and getting loaded when application
+started and display on the console. 
  
 ###Running Test
 ```
@@ -47,8 +51,8 @@ export  APPLICATION_WEATHERMAPAPIKEY="openweather api key" or equlent windows co
 or  you can update application.yml and run without -Dspring-boot.run.jvmArguments
 ####NOTES
 
-- ratelimiting is done in really simple way and wont accurate when have lot of multiple request at time
-  need to use distribute in memory couple with with atomic counter would.  
+- relighting is done in really simple way and wont accurate when have lot of multiple request at time
+  need to use distribute in memory couple with with atomic counter type of implementation.  
 - remove the validation of country code to accommodate sample request (uk is not standard ISO code)
 - include api_key as part of the parameter instead of header variable for simplicity
 
