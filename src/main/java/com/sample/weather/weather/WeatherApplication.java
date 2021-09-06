@@ -37,10 +37,13 @@ public class WeatherApplication implements CommandLineRunner {
 		logger.info("{}",properties);
 		logger.info("=============== Already created 5 never expire Keys =====================");
 		int i =0;
-		List<ApiKey> keys = repository.findAll();
-		for(ApiKey key: keys) {
-			i++;
-			logger.info("KEY {} => {} ",i,key.getKey());
-		}
+		try {
+			List<ApiKey> keys = repository.findAll();
+			for(ApiKey key: keys) {
+				i++;
+				logger.info("KEY {} => {} ",i,key.getKey());
+			}
+
+		}catch (Throwable e){}
 	}
 }

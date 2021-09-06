@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 import java.util.Calendar;
@@ -32,6 +34,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ActiveProfiles("test")
 class ApiKeyServiceImplTest {
     private static Logger logger = LoggerFactory.getLogger("api-key-service-test");
 
@@ -49,9 +52,9 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validationKeyNotFound() {
-
+        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
         doReturn(Optional.empty()).when(repository).findByKey(any());
-        OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertFalse(valid.isSuccess());
         Assert.assertEquals(ErrorCode.forbidden,valid.getErrorCode());
     }
@@ -65,14 +68,14 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validateThrottleSuccess() {
-        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
+        validApiKy = apiKeyService.generateNewKey("aa3@aa.com",0,new Date());
 
         // make  minute than current time => 1st invocation after reset
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE,-55); // 55 minute beforen current time (1st invocation)
+        calendar.add(Calendar.MINUTE,-30); // 55 minute beforen current time (1st invocation)
 
         ApiKey mockKey = new ApiKey();
-        mockKey.setInvocations(4);
+        mockKey.setInvocations(1);
         mockKey.setUpdated(calendar.getTime());
         mockKey.setKey(validApiKy);
         doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
@@ -85,10 +88,10 @@ class ApiKeyServiceImplTest {
     @Test
     void validateThrottleRest() {
         // create key which 1 invocation done in 1 hour go throttle maxed;
-        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
+        validApiKy = apiKeyService.generateNewKey("aa1@aa.com",0,new Date());
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR,-1);
-        calendar.add(Calendar.MINUTE,-2);
+        calendar.add(Calendar.HOUR,-4);
+        calendar.add(Calendar.MINUTE,-15);
         logger.info("{}",calendar.getTime());
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(5);

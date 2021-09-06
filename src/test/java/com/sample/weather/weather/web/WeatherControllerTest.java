@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class WeatherControllerTest {
 
     @MockBean
@@ -54,7 +56,7 @@ class WeatherControllerTest {
         mockMvc.perform(get("/api/weather/current?")
                         .param("country","Australia")
                         .param("city","Melbourne")
-                        .param("apiKey","aiweiweie"))
+                        .param("api_key","aiweiweie"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.city",is("Melbourne")))
@@ -80,7 +82,7 @@ class WeatherControllerTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","Australia")
                 .param("city","Melbourne")
-                .param("apiKey","aiweiweie"))
+                .param("api_key","aiweiweie"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(429));
     }
@@ -101,7 +103,7 @@ class WeatherControllerTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","Australia")
                 .param("city","Melbourne")
-                .param("apiKey","aiweiweie"))
+                .param("api_key","aiweiweie"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isForbidden());
     }
@@ -120,7 +122,7 @@ class WeatherControllerTest {
         doReturn(mockApiValidationResult).when(apiKeyService).validate(any());
         doReturn(mockWeatherResult).when(weatherService).getWeather("Australia","Melbourne");
         mockMvc.perform(get("/api/weather/current?")
-                .param("apiKey","aiweiweie"))
+                .param("api_key","aiweiweie"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isBadRequest());
     }

@@ -75,7 +75,6 @@ public class WeatherApiIntegrationTest {
         key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
-        key.setEmail("test@test.com.au");
         apiKeyRepository.save(key);
 
         // set up weather record
@@ -90,7 +89,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","uk")
                 .param("city","London")
-                .param("apiKey",validApiKey))
+                .param("api_key",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",is("Sunny:fromDB")));
@@ -105,7 +104,6 @@ public class WeatherApiIntegrationTest {
         key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
-        key.setEmail("test@test.com.au");
         apiKeyRepository.save(key);
 
         // record not exist check
@@ -116,7 +114,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Melbourne")
-                .param("apiKey",validApiKey))
+                .param("api_key",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",not("Sunny:fromDB")));
@@ -131,7 +129,7 @@ public class WeatherApiIntegrationTest {
         key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
-        key.setEmail("test3@test.com.au");
+
         apiKeyRepository.save(key);
 
 
@@ -149,7 +147,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","NZ")
                 .param("city","Auckland")
-                .param("apiKey",validApiKey))
+                .param("api_key",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",not("Sunny:fromDB")));
@@ -164,14 +162,14 @@ public class WeatherApiIntegrationTest {
         key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
-        key.setEmail("test4@test.com.au");
+
         apiKeyRepository.save(key);
 
 
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","PP")
                 .param("city","Auck1")
-                .param("apiKey",validApiKey))
+                .param("api_key",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(404));
 
@@ -186,14 +184,14 @@ public class WeatherApiIntegrationTest {
         key.setKey(validApiKey);
         key.setInvocations(5);
         key.setUpdated(new Date());
-        key.setEmail("test5@test.com.au");
+
         apiKeyRepository.save(key);
 
 
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Sydney")
-                .param("apiKey",validApiKey))
+                .param("api_key",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(429));
 
@@ -205,7 +203,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Sydney")
-                .param("apiKey","ewrewoerwioewrouweriuowreuioueriuuiweroui"))
+                .param("api_key","ewrewoerwioewrouweriuowreuioueriuuiweroui"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isForbidden());
     }
@@ -222,7 +220,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Sydney")
-                .param("apiKey",expiredKey))
+                .param("api_key",expiredKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isForbidden());
     }

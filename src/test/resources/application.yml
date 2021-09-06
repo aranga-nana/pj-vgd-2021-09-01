@@ -1,3 +1,13 @@
+spring:
+  profiles:
+    active: test
+    jpa:
+      hibernate:
+        ddl-auto: none
+  sql:
+    init:
+      mode: never
+
 application:
   throttle: 5
   weatherMapApiKey: add key for testing here

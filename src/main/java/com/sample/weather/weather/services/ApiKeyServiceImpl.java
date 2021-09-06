@@ -62,29 +62,37 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
     @Override
     public boolean validateApiKey(String apiKey){
+       if (StringUtils.isEmpty(apiKey)){
+           return false;
+       }
        Date now = new Date();
-       byte[] decode =  Base64.getDecoder().decode(apiKey);
-       String decodedKey = new String(decode);
-       String parts[] = decodedKey.split("\\.");
-       if (parts.length != 4) {
-           return false;
-       }
-       if (!NumberUtils.isCreatable(parts[2])) {
-           return false;
-       }
-       // expiry check
-       Long expireAt = Long.valueOf(parts[2]);
-       if (!expireAt.equals(0) && now.getTime() > expireAt){
+       try {
+           byte[] decode =  Base64.getDecoder().decode(apiKey);
+           String decodedKey = new String(decode);
+           String parts[] = decodedKey.split("\\.");
+           if (parts.length != 4) {
+               return false;
+           }
+           if (!NumberUtils.isCreatable(parts[2])) {
+               return false;
+           }
+           // expiry check
+           Long expireAt = Long.valueOf(parts[2]);
+           if (!expireAt.equals(0) && now.getTime() > expireAt){
 
+               return false;
+           }
+           // tamper check
+           String payload = parts[0]+"."+parts[1]+"."+parts[2];
+           String hash = generateHashWithSalt(payload);
+           if (!hash.equals(parts[3])) {
+               return false;
+           }
+           return true;
+
+       }catch (Throwable e){
            return false;
        }
-       // tamper check
-       String payload = parts[0]+"."+parts[1]+"."+parts[2];
-       String hash = generateHashWithSalt(payload);
-       if (!hash.equals(parts[3])) {
-           return false;
-       }
-       return true;
 
     }
     /**

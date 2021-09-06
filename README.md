@@ -27,7 +27,8 @@ Current design based on restful api design which.
   ApiKeyRepository - store for api key
   WeatherRepository - dealing with cache weather information.  
   
-#####Key Schema design
+####Enforce API Key scheme
+This is not really clear in order to address that. Assuming we have to come up with logic which can enclose some useful data in the token(however it says its not necessary).
 use dot notation to devide field into hold following information.
 <base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 and salt including>
 whole string then been encode as base64. using hash with salt make key tamper protected.

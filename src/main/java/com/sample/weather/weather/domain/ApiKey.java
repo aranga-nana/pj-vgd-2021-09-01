@@ -10,21 +10,12 @@ public class ApiKey {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
 
     @Column(name = "api_key",unique = true)
     private String key;
 
     private Date updated;
     private int invocations;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getKey() {
         return key;
