@@ -18,6 +18,7 @@ import com.sample.weather.weather.common.OutputResult;
 import com.sample.weather.weather.domain.Weather;
 import com.sample.weather.weather.repository.WeatherRepository;
 import com.sample.weather.weather.services.dto.WeatherInfoDTO;
+import org.junit.Before;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,6 +78,9 @@ class WeatherServiceImplTest {
     @Test
     @DisplayName("getWeather: from the api service (not found in db) - SUCCESS")
     void getWeatherFromApiNotFoundInDb() {
+        Weather mockSaved = new Weather();
+        mockSaved.setId(1);
+        doReturn(mockSaved).when(repository).save(any());
 
         doReturn(Optional.empty()).when(repository).findByCountryAndCity("Australia", "Sydney");
         doReturn(Optional.of("Sunny")).when(apiService).getWeatherDescription("Australia", "Sydney");
@@ -89,12 +93,16 @@ class WeatherServiceImplTest {
     @DisplayName("getWeather: from the api service (ttl of weather records expires) - SUCCESS")
     void getWeatherFromApiTTLExpired() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR,-6);
+        calendar.add(Calendar.HOUR,- 7);
         Weather mocWeather = new Weather();
         mocWeather.setCity("Melbourne");
         mocWeather.setCountry("Australia");
         mocWeather.setDescription("Sunny");
         mocWeather.setUpdated(calendar.getTime()); // expired
+
+        Weather mockSaved = new Weather();
+        mockSaved.setId(1);
+        doReturn(mockSaved).when(repository).save(any());
 
         doReturn(Optional.of(mocWeather)).when(repository).findByCountryAndCity("Australia", "Sydney");
         doReturn(Optional.of("Partly Cloudy")).when(apiService).getWeatherDescription("Australia", "Sydney");

@@ -10,14 +10,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 
 @Service
+@Transactional
 public class WeatherServiceImpl implements WeatherService {
 
     private static Logger logger = LoggerFactory.getLogger(WeatherServiceImpl.class);
@@ -34,16 +37,21 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public OutputResult<WeatherInfoDTO> getWeather(String country, String city) {
+
         if (StringUtils.isEmpty(city) || StringUtils.isEmpty(city)) {
             return new OutputResult<WeatherInfoDTO>().withSuccess(false).withErrorCode(ErrorCode.error);
         }
         Optional<Weather> oWeather = weatherRepository.findByCountryAndCity(country,city);
+        Weather weather = new Weather();
+        weather.setCity(city);
+        weather.setCountry(country);
 
         final WeatherInfoDTO infoDTO = new WeatherInfoDTO();
         infoDTO.setCountry(country);
         infoDTO.setCity(city);
 
         if (oWeather.isPresent()) {
+            weather = oWeather.get();
             Instant from = oWeather.get().getUpdated().toInstant();
             Instant now = Instant.now();
             Duration duration = Duration.between(from,now);
@@ -59,6 +67,10 @@ public class WeatherServiceImpl implements WeatherService {
             Optional<String> oDescription = apiService.getWeatherDescription(country,city);
             if (oDescription.isPresent()){
                 infoDTO.setDescription(oDescription.get());
+                weather.setDescription(infoDTO.getDescription());
+                weather.setUpdated(new Date());
+                Weather saved = weatherRepository.save(weather);
+                logger.info("NEW RECORD {}",saved.getId());
                 return new OutputResult<WeatherInfoDTO>().withData(infoDTO).withSuccess(true);
             }
             return new OutputResult<WeatherInfoDTO>().withSuccess(false).withErrorCode(ErrorCode.notFound);

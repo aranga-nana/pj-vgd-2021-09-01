@@ -58,7 +58,7 @@ public class WeatherApiIntegrationTest {
     private ApiKeyService keyService;
 
 
-    private final String validApiKey = "ZFhObGNqQkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ4LjE2MzA4OTU4NzQwNDguNTIyMUJCQTQyNTU2RTcwNkQ5MEJGNTQ2NUE3M0JEMzQ=";
+    private final String validApiKey = "ZFhObGNqUkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwOTE0OTc1NTQ4LjAuQTM0OEI3M0QyNDZEMzU1MURFQkVDQUQ4MTg3QzEzRkI=";
 
     public ConnectionHolder getConnectionHolder() {
         // Return a function that retrieves a connection from our data source
@@ -120,7 +120,7 @@ public class WeatherApiIntegrationTest {
                 .andExpect(jsonPath("$.description",not("Sunny:fromDB")));
     }
     @Test
-    @DisplayName("/api/weather/current?country=NZ&city=Auckland - SUCCESS (record from OpenWeather due to wether record TTL expire")
+    @DisplayName("/api/weather/current?country=NZ&city=Auckland - SUCCESS (record from OpenWeather due to weather record TTL expire)")
     void getWeatherFromOpenWeatherServiceTTLExpires() throws Exception{
 
         // api key
