@@ -1,5 +1,5 @@
 application:
   throttle: 5
-  weatherMapApiKey: add api key
+  weatherMapApiKey: add key for testing here
   ttl: 5
   apiBaseUrl: http://api.openweathermap.org/data/2.5/weather
