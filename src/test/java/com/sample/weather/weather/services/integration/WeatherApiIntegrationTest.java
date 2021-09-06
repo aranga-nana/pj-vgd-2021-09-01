@@ -57,7 +57,7 @@ public class WeatherApiIntegrationTest {
         return () -> dataSource.getConnection();
     }
 
-    //@Test
+    @Test
     @DisplayName("/api/weather/current?country=uk&city=London - SUCCESS ( from db)")
     void getWeatherFromDbSuccess() throws Exception{
 
