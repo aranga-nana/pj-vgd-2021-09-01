@@ -40,10 +40,6 @@ class ApiKeyServiceImplTest {
 
     private String validApiKy;
 
-    @Before
-    void init(){
-
-    }
 
     @Test
     void validationKeyNotFound() {
@@ -65,17 +61,14 @@ class ApiKeyServiceImplTest {
     void validateThrottleSuccess() {
         validApiKy = apiKeyService.generateNewKey("aa3@aa.com",0,new Date());
 
-        // make  minute than current time => 1st invocation after reset
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE,-30); // 55 minute beforen current time (1st invocation)
 
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(1);
-        mockKey.setUpdated(calendar.getTime());
-        mockKey.setKey(validApiKy);
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
+        mockKey.setUpdated(new Date());
+        mockKey.setKey("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
 
-        OutputResult valid = apiKeyService.validate(validApiKy);
+        OutputResult valid = apiKeyService.validate("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
         Assert.assertTrue(valid.isSuccess());
 
     }
@@ -83,7 +76,7 @@ class ApiKeyServiceImplTest {
     @Test
     void validateThrottleRest() {
         // create key which 1 invocation done in 1 hour go throttle maxed;
-        validApiKy = apiKeyService.generateNewKey("aa1@aa.com",0,new Date());
+
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR,-4);
         calendar.add(Calendar.MINUTE,-15);
@@ -91,10 +84,10 @@ class ApiKeyServiceImplTest {
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(5);
         mockKey.setUpdated(calendar.getTime());
-        mockKey.setKey(validApiKy);
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
-        OutputResult valid = apiKeyService.validate(validApiKy);
-        Assert.assertTrue(valid.isSuccess());
+        mockKey.setKey("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
+        OutputResult valid = apiKeyService.validate("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        assertTrue(valid.isSuccess());
 
     }
 
