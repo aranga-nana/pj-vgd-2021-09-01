@@ -43,7 +43,7 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validationKeyNotFound() {
-        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
+        validApiKy = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
         doReturn(Optional.empty()).when(repository).findByKey(any());
         OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertFalse(valid.isSuccess());
@@ -59,7 +59,7 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validateThrottleSuccess() {
-        validApiKy = apiKeyService.generateNewKey("aa3@aa.com",0,new Date());
+        validApiKy = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
 
 
         ApiKey mockKey = new ApiKey();
@@ -106,7 +106,7 @@ class ApiKeyServiceImplTest {
 
     @Test
     void generateNewKeyTest() {
-        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",30,new Date());
+        String apiKey = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
         logger.info("API Keys{}",apiKey);
         logger.info("{}",apiKey);
         String decode = new String(Base64.getDecoder().decode(apiKey));
