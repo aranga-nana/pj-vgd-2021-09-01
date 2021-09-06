@@ -190,6 +190,7 @@ public class WeatherApiIntegrationTest {
                 .andExpect(status().is(429));
 
     }
+    @Test
     @DisplayName("/api/weather/current?country=AU&city=Sydney - FAIL (Invalid key)")
     void getWeatherFromOpenWeatherServiceInvalidApiKey() throws Exception{
 
