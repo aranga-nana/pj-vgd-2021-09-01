@@ -49,12 +49,12 @@ class WeatherServiceImplTest {
     void getWeatherFromDbSuccess() {
         Weather mocWeather = new Weather();
         mocWeather.setCity("Melbourne");
-        mocWeather.setCountry("Australia");
+        mocWeather.setCountry("AU");
         mocWeather.setDescription("Sunny");
         mocWeather.setUpdated(new Date());
-        doReturn(Optional.of(mocWeather)).when(repository).findByCountryAndCity("Australia", "Melbourne");
+        doReturn(Optional.of(mocWeather)).when(repository).findByCountryAndCity("AU", "Melbourne");
 
-        OutputResult<WeatherInfoDTO> found = weatherService.getWeather("Australia","Melbourne");
+        OutputResult<WeatherInfoDTO> found = weatherService.getWeather("AU","Melbourne");
         assertTrue(found.isSuccess(),"GET WEATHER - FROM DB - SUCCESS");
         assertEquals("Sunny",found.getData().getDescription());
     }

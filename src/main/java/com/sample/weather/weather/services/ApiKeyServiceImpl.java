@@ -46,7 +46,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Instant from = key.getUpdated().toInstant();
         Instant now = Instant.now();
         Duration duration = Duration.between(from,now);
-        if (duration.toMinutes() < 60 && key.getInvocations() > 5) {
+        if (duration.toMinutes() <= 60 && key.getInvocations() > 5) {
 
             return new OutputResult().withSuccess(false).withErrorCode(ErrorCode.rateExceeded);
         }

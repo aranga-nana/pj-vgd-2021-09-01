@@ -47,7 +47,9 @@ public class WeatherServiceImpl implements WeatherService {
             Instant from = oWeather.get().getUpdated().toInstant();
             Instant now = Instant.now();
             Duration duration = Duration.between(from,now);
-            if (duration.toHours() < appProp.getTtl()) {
+            final long ttlInMinutes = appProp.getTtl()* 60;
+
+            if (duration.toMinutes() <= ttlInMinutes ) {
                 infoDTO.setDescription(oWeather.get().getDescription());
                 return new OutputResult<WeatherInfoDTO>().withData(infoDTO).withSuccess(true);
             }
