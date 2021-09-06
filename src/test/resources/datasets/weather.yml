@@ -1,0 +1,10 @@
+weather:
+  - country: au
+    city: melbourne
+    updated: '2021-09-03'
+    description: sunny
+
+  - country: uk
+    city: london
+    updated: '2021-09-03'
+    description: cloudy
