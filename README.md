@@ -1,6 +1,6 @@
-# CODE CHALLENGE
-### Requirements 
-######(extract from the document provided without any modification)
+#CODE CHALLENGE
+###Requirements 
+###### (extract from the document provided without any modification)
 Develop SpringBoot application and test a HTTP REST API in that fronts the OpenWeatherMap service: OpenWeatherMap name service guide: http://openweathermap.org/current#name . (Example: http://samples.openweathermap.org/data/2.5/weather?q=London,uk) 
 Your service should: 
 1.	Enforce API Key scheme. An API Key is rate limited to 5 weather reports an hour. After that your service should respond in a way which communicates that the hourly limit has been exceeded. Create 5 API Keys. Pick a convention for handling them that you like; using simple string constants is fine. This is NOT an exercise about generating and distributing API Keys. Assume that the user of your service knows about them.
