@@ -33,14 +33,17 @@ public class WeatherApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
 		logger.info("{}",properties);
 		logger.info("=============== Generating 5 never expire Keys =====================");
 		List<ApiKey> keys = repository.findAll();
 		if (keys.size() == 0) {
+			logger.info("CREATING NEW SET OF KEYS");
 			for(int i=0;i < 5;i++) {
 				ApiKey key = new ApiKey();
 				key.setEmail("user"+i+"@example.com.au");
-				key.setKey(apiKeyService.generateNewKey(key.getEmail(),0,new Date()));
+				String k = apiKeyService.generateNewKey(key.getEmail(),0,new Date());
+				key.setKey(k);
 				key.setUpdated(new Date());
 				key.setInvocations(0);
 				repository.save(key);
@@ -55,7 +58,5 @@ public class WeatherApplication implements CommandLineRunner {
 				logger.info("KEY {} => {} ",i,key.getKey());
 			}
 		}
-
-
 	}
 }
