@@ -10,5 +10,6 @@ application:
   weatherMapApiKey: ${WEATHER_API_KEY:"add api key"}
   ttl: 5
   apiBaseUrl: http://api.openweathermap.org/data/2.5/weather
+  salt: securesalt
 
 

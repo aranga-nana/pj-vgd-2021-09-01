@@ -12,14 +12,41 @@ Your service should:
 7.	Follow Rest API convention.
 
 #Design
+Current design based on restful api design which.
+- Transport layer (Rest)
+  WeatherController which handle the user request. It also responsible for passing
+  correct http status code to client 
+- Service Layer
+  Basically logic layer and also interact with other services.
+  ApiKeyService - dealing with api key related logic including key schema and 
+  WeatherService - core application logic around the weather service
+  OpenWeatherApiService - communicate with external Open Weather Api and provide data 
+    
+- Data Access Layer
+  perforce database related operation
+  ApiKeyRepository - store for api key
+  WeatherRepository - dealing with cache weather information.  
+#####Key Schema design
+use dot notation to devide field into hold following information.
+<base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 parts including>
+whole string then been encode as base64
 
-#How to Run
+ 
+###Running Test
+```
+export  APPLICATION_WEATHERMAPAPIKEY="openweather api key" or equlent windows command 
+# instead of export you can update application.yml in test/resources with key.
+
+./mvnw test 
+```
+###How to Run
 ```
  ./mvnw  spring-boot:run -Dspring-boot.run.jvmArguments="-Dapplication.weatherMapApiKey=<your api key>"
 
 ```
 or  you can update application.yml and run without -Dspring-boot.run.jvmArguments
 ####NOTES
+
 - ratelimiting is done in really simple way and wont accurate when have lot of multiple request at time
   need to use distribute in memory couple with with atomic counter would.  
 - remove the validation of country code to accommodate sample request (uk is not standard ISO code)

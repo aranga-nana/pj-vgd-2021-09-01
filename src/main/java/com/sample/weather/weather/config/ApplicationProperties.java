@@ -11,6 +11,7 @@ public class ApplicationProperties {
     private String weatherMapApiKey;
     private Integer ttl;
     private String apiBaseUrl;
+    private String salt;
 
     public Integer getThrottle() {
         return throttle;
@@ -42,6 +43,14 @@ public class ApplicationProperties {
 
     public void setApiBaseUrl(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     @Override

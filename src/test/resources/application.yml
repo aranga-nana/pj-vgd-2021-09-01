@@ -3,3 +3,4 @@ application:
   weatherMapApiKey: add key for testing here
   ttl: 5
   apiBaseUrl: http://api.openweathermap.org/data/2.5/weather
+  salt: securesalt

@@ -17,6 +17,7 @@ import com.sample.weather.weather.common.OutputResult;
 import com.sample.weather.weather.domain.ApiKey;
 import com.sample.weather.weather.repository.ApiKeyRepository;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -41,8 +43,16 @@ class ApiKeyServiceImplTest {
     @Autowired
     private ApiKeyService apiKeyService;
 
+    private String validApiKy;
+
+    @Before
+    void init(){
+
+    }
+
     @Test
     void validationKeyNotFound() {
+
         doReturn(Optional.empty()).when(repository).findByKey(any());
         OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
         Assert.assertFalse(valid.isSuccess());
@@ -58,6 +68,7 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validateThrottleSuccess() {
+        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
 
         // make  minute than current time => 1st invocation after reset
         Calendar calendar = Calendar.getInstance();
@@ -66,10 +77,10 @@ class ApiKeyServiceImplTest {
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(4);
         mockKey.setUpdated(calendar.getTime());
-        mockKey.setKey("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
+        mockKey.setKey(validApiKy);
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
 
-        OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertTrue(valid.isSuccess());
 
     }
@@ -77,6 +88,7 @@ class ApiKeyServiceImplTest {
     @Test
     void validateThrottleRest() {
         // create key which 1 invocation done in 1 hour go throttle maxed;
+        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR,-1);
         calendar.add(Calendar.MINUTE,-2);
@@ -84,31 +96,57 @@ class ApiKeyServiceImplTest {
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(5);
         mockKey.setUpdated(calendar.getTime());
-        mockKey.setKey("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
-        OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        mockKey.setKey(validApiKy);
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
+        OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertTrue(valid.isSuccess());
 
     }
 
     @Test
     void validateThrottleFailed() {
+        validApiKy = apiKeyService.generateNewKey("aa@aa.com",0,new Date());
 
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(5);
         mockKey.setUpdated(new Date());
-        mockKey.setKey("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
-        OutputResult valid = apiKeyService.validate("10001.YWJjQG91dGxvb2suY29tLmF1.4B74922CC2D00E4A79D7181F247F82B7");
+        mockKey.setKey(validApiKy);
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
+        OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertFalse(valid.isSuccess());
     }
 
     @Test
     void generateNewKeyTest() {
-        String apiKey = apiKeyService.generateNewKey("10001","abc@outlook.com.au");
+        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",30,new Date());
+        logger.info("API Keys{}",apiKey);
         logger.info("{}",apiKey);
-        Assert.assertNotNull(apiKey);
-        String[] parts = apiKey.split("\\.");
-        Assert.assertEquals(3,parts.length);
+        String decode = new String(Base64.getDecoder().decode(apiKey));
+
+        String[] parts = decode.split("\\.");
+        Assert.assertEquals(4,parts.length);
     }
+    @Test
+    void ValidateKeySuccess() {
+        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",30,new Date());
+        assertTrue(apiKeyService.validateApiKey(apiKey));
+    }
+    @Test
+    void ValidateKeyExpire() {
+        // generate key  issue 1 hour a go and only valid for 5 min
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR,-1);
+        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",5,calendar.getTime());
+
+        assertFalse(apiKeyService.validateApiKey(apiKey));
+    }
+    @Test
+    void generate5keys() {
+        for(int i=0;i < 5;i++){
+            String user = "user"+i+"@weather-example.com.au";
+            String apiKey = apiKeyService.generateNewKey(user,0,new Date());
+            logger.info("KEY{} {} {}",i,user,apiKey);
+        }
+    }
+
 }

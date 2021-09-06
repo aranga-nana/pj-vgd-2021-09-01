@@ -49,7 +49,7 @@ class ApiKeyRepositoryTest {
     @Test
     @DataSet("keys.yml")
     void findByKey() {
-        Optional<ApiKey> apiKeys = repository.findByKey("101.qwewqeqw");
+        Optional<ApiKey> apiKeys = repository.findByKey("ZFhObGNqQkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ4LjE2MzA4OTU4NzQwNDguNTIyMUJCQTQyNTU2RTcwNkQ5MEJGNTQ2NUE3M0JEMzQ=");
         Assert.assertTrue(apiKeys.isPresent());
     }
     @Test

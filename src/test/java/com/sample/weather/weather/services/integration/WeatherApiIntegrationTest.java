@@ -6,6 +6,7 @@ import com.sample.weather.weather.domain.ApiKey;
 import com.sample.weather.weather.domain.Weather;
 import com.sample.weather.weather.repository.ApiKeyRepository;
 import com.sample.weather.weather.repository.WeatherRepository;
+import com.sample.weather.weather.services.ApiKeyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.Calendar;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Transactional
 public class WeatherApiIntegrationTest {
 
 
@@ -51,6 +54,11 @@ public class WeatherApiIntegrationTest {
     @Autowired
     private ApiKeyRepository apiKeyRepository;
 
+    @Autowired
+    private ApiKeyService keyService;
+
+
+    private final String validApiKey = "ZFhObGNqQkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ4LjE2MzA4OTU4NzQwNDguNTIyMUJCQTQyNTU2RTcwNkQ5MEJGNTQ2NUE3M0JEMzQ=";
 
     public ConnectionHolder getConnectionHolder() {
         // Return a function that retrieves a connection from our data source
@@ -62,9 +70,9 @@ public class WeatherApiIntegrationTest {
     void getWeatherFromDbSuccess() throws Exception{
 
         // api key
-        final String apiKey = "1000.100000";
+
         ApiKey key = new ApiKey();
-        key.setKey(apiKey);
+        key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
         key.setEmail("test@test.com.au");
@@ -82,7 +90,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","uk")
                 .param("city","London")
-                .param("apiKey",apiKey))
+                .param("apiKey",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",is("Sunny:fromDB")));
@@ -92,9 +100,9 @@ public class WeatherApiIntegrationTest {
     void getWeatherFromOpenWeatherService() throws Exception{
 
         // api key
-        final String apiKey = "1000.100001";
+
         ApiKey key = new ApiKey();
-        key.setKey(apiKey);
+        key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
         key.setEmail("test@test.com.au");
@@ -108,7 +116,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Melbourne")
-                .param("apiKey",apiKey))
+                .param("apiKey",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",not("Sunny:fromDB")));
@@ -118,9 +126,9 @@ public class WeatherApiIntegrationTest {
     void getWeatherFromOpenWeatherServiceTTLExpires() throws Exception{
 
         // api key
-        final String apiKey = "1000.100003";
+
         ApiKey key = new ApiKey();
-        key.setKey(apiKey);
+        key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
         key.setEmail("test3@test.com.au");
@@ -141,7 +149,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","NZ")
                 .param("city","Auckland")
-                .param("apiKey",apiKey))
+                .param("apiKey",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description",not("Sunny:fromDB")));
@@ -151,9 +159,9 @@ public class WeatherApiIntegrationTest {
     void getWeatherFromOpenWeatherServiceTInvalidCountryCity() throws Exception{
 
         // api key
-        final String apiKey = "1000.100004";
+
         ApiKey key = new ApiKey();
-        key.setKey(apiKey);
+        key.setKey(validApiKey);
         key.setInvocations(1);
         key.setUpdated(new Date());
         key.setEmail("test4@test.com.au");
@@ -163,7 +171,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","PP")
                 .param("city","Auck1")
-                .param("apiKey",apiKey))
+                .param("apiKey",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(404));
 
@@ -173,9 +181,9 @@ public class WeatherApiIntegrationTest {
     void getWeatherFromOpenWeatherServiceThrottle() throws Exception{
 
         // api key
-        final String apiKey = "1000.100005";
+
         ApiKey key = new ApiKey();
-        key.setKey(apiKey);
+        key.setKey(validApiKey);
         key.setInvocations(5);
         key.setUpdated(new Date());
         key.setEmail("test5@test.com.au");
@@ -185,7 +193,7 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Sydney")
-                .param("apiKey",apiKey))
+                .param("apiKey",validApiKey))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(429));
 
@@ -197,9 +205,28 @@ public class WeatherApiIntegrationTest {
         mockMvc.perform(get("/api/weather/current?")
                 .param("country","AU")
                 .param("city","Sydney")
-                .param("apiKey","230340340"))
+                .param("apiKey","ewrewoerwioewrouweriuowreuioueriuuiweroui"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("/api/weather/current?country=AU&city=Sydney - FAIL (expired key)")
+    void getWeatherFromOpenWeatherServiceExpireApiKey() throws Exception {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR,-2);
+        String expiredKey = keyService.generateNewKey("test@test.com",5,calendar.getTime());
+
+
+        mockMvc.perform(get("/api/weather/current?")
+                .param("country","AU")
+                .param("city","Sydney")
+                .param("apiKey",expiredKey))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isForbidden());
+    }
+
+
 
 }
