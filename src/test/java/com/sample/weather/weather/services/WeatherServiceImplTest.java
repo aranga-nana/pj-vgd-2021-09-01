@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -116,7 +117,7 @@ class WeatherServiceImplTest {
     void getWeatherApiError() {
 
         doReturn(Optional.empty()).when(repository).findByCountryAndCity("Australia", "Sydney");
-        doThrow(IllegalStateException.class).when(apiService).getWeatherDescription("Australia", "Sydney");
+        doThrow(HttpClientErrorException.class).when(apiService).getWeatherDescription("Australia", "Sydney");
 
         OutputResult<WeatherInfoDTO> found = weatherService.getWeather("Australia","Sydney");
         assertFalse(found.isSuccess());

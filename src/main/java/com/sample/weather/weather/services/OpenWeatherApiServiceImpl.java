@@ -8,6 +8,8 @@ import com.sample.weather.weather.services.dto.OpenWeatherMapResponse;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.*;
 
 @Service
 public class OpenWeatherApiServiceImpl implements OpenWeatherApiService {
+    private static Logger logger = LoggerFactory.getLogger(OpenWeatherApiServiceImpl.class);
 
     private final ApplicationProperties appProp;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -46,6 +49,7 @@ public class OpenWeatherApiServiceImpl implements OpenWeatherApiService {
         reqBuilder.append(appProp.getWeatherMapApiKey());
 
         try {
+
             ResponseEntity<OpenWeatherMapResponse> response =  template.getForEntity(reqBuilder.toString(),
                     OpenWeatherMapResponse.class);
             if (response.getStatusCodeValue() == 200
@@ -59,6 +63,7 @@ public class OpenWeatherApiServiceImpl implements OpenWeatherApiService {
               if (ex.getRawStatusCode() == 404) {
                   return Optional.empty();
               }
+              logger.error("open weather critical error error code {}", ex.getRawStatusCode(),ex);
               throw ex;
         }
        return Optional.empty();

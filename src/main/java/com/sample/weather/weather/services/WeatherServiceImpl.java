@@ -61,6 +61,7 @@ public class WeatherServiceImpl implements WeatherService {
                 infoDTO.setDescription(oWeather.get().getDescription());
                 return new OutputResult<WeatherInfoDTO>().withData(infoDTO).withSuccess(true);
             }
+            logger.info("TTL of weather report expired. request new data from the open weather . TTL set to {} hours",appProp.getTtl());
         }
 
         try {
@@ -70,7 +71,7 @@ public class WeatherServiceImpl implements WeatherService {
                 weather.setDescription(infoDTO.getDescription());
                 weather.setUpdated(new Date());
                 Weather saved = weatherRepository.save(weather);
-                logger.info("NEW RECORD {}",saved.getId());
+                logger.info("UPDATED/CREATED RECORD {}",saved.getId());
                 return new OutputResult<WeatherInfoDTO>().withData(infoDTO).withSuccess(true);
             }
             return new OutputResult<WeatherInfoDTO>().withSuccess(false).withErrorCode(ErrorCode.notFound);

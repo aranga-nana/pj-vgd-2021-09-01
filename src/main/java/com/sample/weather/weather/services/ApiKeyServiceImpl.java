@@ -7,6 +7,8 @@ import com.sample.weather.weather.domain.ApiKey;
 import com.sample.weather.weather.repository.ApiKeyRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
@@ -21,6 +23,8 @@ import java.util.Optional;
 
 @Service
 public class ApiKeyServiceImpl implements ApiKeyService {
+
+    private static Logger logger = LoggerFactory.getLogger(ApiKeyServiceImpl.class);
 
     private final static OutputResult FORBIDDEN_STATUS
             = new OutputResult().withSuccess(false).withErrorCode(ErrorCode.forbidden);
@@ -71,26 +75,30 @@ public class ApiKeyServiceImpl implements ApiKeyService {
            String decodedKey = new String(decode);
            String parts[] = decodedKey.split("\\.");
            if (parts.length != 4) {
+               logger.error("Invalid api key. encode error");
                return false;
            }
            if (!NumberUtils.isCreatable(parts[2])) {
+               logger.error("Invalid api key. cannot find expireAt");
                return false;
            }
            // expiry check
            Long expireAt = Long.valueOf(parts[2]);
            if (!expireAt.equals(0) && now.getTime() > expireAt){
-
+               logger.error("api token expired . expiredAt {}",expireAt);
                return false;
            }
            // tamper check
            String payload = parts[0]+"."+parts[1]+"."+parts[2];
            String hash = generateHashWithSalt(payload);
            if (!hash.equals(parts[3])) {
+               logger.error("token has not matched. token is tampered with original hash {}",parts[3]);
                return false;
            }
            return true;
 
        }catch (Throwable e){
+           logger.error("critical error while processing token, {}",e.getMessage(),e);
            return false;
        }
 
