@@ -49,7 +49,7 @@ public class OpenWeatherApiServiceImpl implements OpenWeatherApiService {
         reqBuilder.append(appProp.getWeatherMapApiKey());
 
         try {
-
+            logger.info("request {}?q={},{}&apiid=xxxxxxxxxx",appProp.getApiBaseUrl(),country,city);
             ResponseEntity<OpenWeatherMapResponse> response =  template.getForEntity(reqBuilder.toString(),
                     OpenWeatherMapResponse.class);
             if (response.getStatusCodeValue() == 200

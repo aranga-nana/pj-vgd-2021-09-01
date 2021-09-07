@@ -38,12 +38,12 @@ class ApiKeyServiceImplTest {
     @Autowired
     private ApiKeyService apiKeyService;
 
-    private String validApiKy;
+    private String validApiKy = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwOTE0OTc1NTQ1LjAuRkIwQUY4REZEQUFCQkM1OTNBNUY0NkEyQzAzMTNBQ0I=";
 
 
     @Test
     void validationKeyNotFound() {
-        validApiKy = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
+
         doReturn(Optional.empty()).when(repository).findByKey(any());
         OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertFalse(valid.isSuccess());
@@ -59,16 +59,16 @@ class ApiKeyServiceImplTest {
 
     @Test
     void validateThrottleSuccess() {
-        validApiKy = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
+
 
 
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(1);
         mockKey.setUpdated(new Date());
-        mockKey.setKey("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        mockKey.setKey(validApiKy);
         doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
 
-        OutputResult valid = apiKeyService.validate("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        OutputResult valid = apiKeyService.validate(validApiKy);
         Assert.assertTrue(valid.isSuccess());
 
     }
@@ -84,9 +84,9 @@ class ApiKeyServiceImplTest {
         ApiKey mockKey = new ApiKey();
         mockKey.setInvocations(5);
         mockKey.setUpdated(calendar.getTime());
-        mockKey.setKey("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
-        doReturn(Optional.of(mockKey)).when(repository).findByKey(any());
-        OutputResult valid = apiKeyService.validate("ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=");
+        mockKey.setKey(validApiKy);
+        doReturn(Optional.of(mockKey)).when(repository).findByKey(validApiKy);
+        OutputResult valid = apiKeyService.validate(validApiKy);
         assertTrue(valid.isSuccess());
 
     }
@@ -106,7 +106,7 @@ class ApiKeyServiceImplTest {
 
     @Test
     void generateNewKeyTest() {
-        String apiKey = "ZFhObGNqRkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwODk1ODc0MDQ5LjE2MzA4OTU4NzQwNDkuN0MzMUQ5NUQwOUI4OTY2QzhBMTMzRDZGQUYwOUYxMTk=";
+        String apiKey = validApiKy;
         logger.info("API Keys{}",apiKey);
         logger.info("{}",apiKey);
         String decode = new String(Base64.getDecoder().decode(apiKey));
@@ -124,9 +124,20 @@ class ApiKeyServiceImplTest {
         // generate key  issue 1 hour a go and only valid for 5 min
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR,-1);
-        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",5,calendar.getTime());
+        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",30,calendar.getTime());
 
         assertFalse(apiKeyService.validateApiKey(apiKey));
+    }
+    @Test
+    void ValidateKeyNonExpire() {
+        // generate key  issue 1 hour a go and only valid for 5 min
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR,-1); // issue date 1 year ago
+        String apiKey = apiKeyService.generateNewKey("user1@expal.com.au",0,calendar.getTime());
+        String plainKey = new String(Base64.getDecoder().decode(apiKey.getBytes()));
+        String[]  parts = plainKey.split("\\.");
+        assertEquals("0",parts[2]);
+        assertTrue(apiKeyService.validateApiKey(apiKey));
     }
     @Test
     void generate5keys() {

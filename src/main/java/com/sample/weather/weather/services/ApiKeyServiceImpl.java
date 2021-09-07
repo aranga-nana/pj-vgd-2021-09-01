@@ -39,7 +39,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     public OutputResult validate(String apiKey) {
-        if (validateApiKey(apiKey)) {
+        if (!validateApiKey(apiKey)) {
             return FORBIDDEN_STATUS;
         }
         Optional<ApiKey> oKey = repository.findByKey(apiKey);
@@ -84,10 +84,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
            }
            // expiry check
            Long expireAt = Long.valueOf(parts[2]);
-           if (!expireAt.equals(0) && now.getTime() > expireAt){
+           if (expireAt.longValue() != 0 && now.getTime() > expireAt){
                logger.error("api token expired . expiredAt {}",expireAt);
                return false;
            }
+           logger.info("Never expire key(true|false): {}",expireAt.longValue() == 0 ? true: false);
            // tamper check
            String payload = parts[0]+"."+parts[1]+"."+parts[2];
            String hash = generateHashWithSalt(payload);
@@ -116,8 +117,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(issueAt);
         calendar.add(Calendar.MINUTE,expiredIn);
+        long expireAt = 0;
+        if (expiredIn != 0){
+            expireAt = calendar.getTime().getTime();
+        }
 
-        String payLoad = new String(Base64.getEncoder().encode(email.getBytes()))+"."+issueAt.getTime()+"."+calendar.getTime().getTime();
+        String payLoad = new String(Base64.getEncoder().encode(email.getBytes()))+"."+issueAt.getTime()+"."+expireAt;
         String hash = generateHashWithSalt(payLoad);
         return Base64.getEncoder().encodeToString((payLoad+"."+hash).getBytes());
     }

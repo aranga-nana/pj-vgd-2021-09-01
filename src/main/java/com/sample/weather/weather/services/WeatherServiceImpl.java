@@ -65,6 +65,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         try {
+
             Optional<String> oDescription = apiService.getWeatherDescription(country,city);
             if (oDescription.isPresent()){
                 infoDTO.setDescription(oDescription.get());

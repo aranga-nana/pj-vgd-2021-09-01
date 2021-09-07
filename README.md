@@ -1,4 +1,4 @@
-# CODE CHALLENGE
+# CODE CHALLENGE (TDD)
 ### Requirements 
 ###### (extract from the document provided without any modification)
 Develop SpringBoot application and test a HTTP REST API in that fronts the OpenWeatherMap service: OpenWeatherMap name service guide: http://openweathermap.org/current#name . (Example: http://samples.openweathermap.org/data/2.5/weather?q=London,uk) 
@@ -12,30 +12,35 @@ Your service should:
 7.	Follow Rest API convention.
 
 # Design
-Current design based on restful api design which.
-- Rest Service
-  WeatherController which handle the user request. It also responsible for passing
-  correct http status code to client 
+Current design based on restful api design which will comprise of following layers:
+- Rest Layer (transport / http and handlers)
+    WeatherController which handle the user request and is also responsible for passing
+    correct http status code to client 
 - Service Layer
-  Basically act as service/logic layer and also interact with other services.
-  ApiKeyService - dealing with api key related logic including key schema and 
-  WeatherService - core application logic around the weather service
-  OpenWeatherApiService - communicate with external Open Weather Api and provide data 
-    
+    It acts as service/logic layer and also interact with other services, such as;
+    ApiKeyService - dealing with api key related logic including key schema and throttling
+    WeatherService - core application logic around the weather service.
+    also implement TTL for weather report cache in the db.
+    OpenWeatherApiService - communicate with external Open Weather Api and provide data 
 - Data Access Layer
-  perforce database related operation
-  ApiKeyRepository - store for api key
-  WeatherRepository - dealing with cache weather information.  
+    perforce database related operation
+    ApiKeyRepository - store for api key and throttle counters
+    WeatherRepository - dealing with cache weather information.  
   
 #### Enforce API Key scheme
-This is not really clear in order to address it correcly. Assuming we have to come up with logic which can enclose some useful data in the token(however it says its not necessary).
-use dot notation to devide field into hold following information.
-key chema:
-<base 64 encoded use email>.<api issue time>.<exire time>.<hash of first 3 and salt including>
+This is not really clear in order to address it correctly. Assuming we have to come up with logic which can enclose some useful data in the token(however it says its not necessary).
+This is the current implementation:
+1. use dot notation to divide field into hold following information.
+2 key schema:
+```
+<base 64 encoded email>.<api key issue time in epoch>.<expire time in  epoch>.<hash of first 3 portions including dots. Add salt for sucrity before hashing>
 whole string then been encode as base64. using hash with salt make key tamper protected.
+expire time 0 mean never expire.
+example: 
 
+```
 ### Initial Data Loading (5 keys)
-- they are saved as 5 sql statement in data.sql and getting loaded when application
+- They are saved as 5 sql statement in data.sql and getting loaded when application
 started and display on the console. 
  
 ### Running Test
@@ -47,14 +52,26 @@ export  APPLICATION_WEATHERMAPAPIKEY="openweather api key" or equlent windows co
 ```
 ### How to Run
 ```
- ./mvnw  spring-boot:run -Dspring-boot.run.jvmArguments="-Dapplication.weatherMapApiKey=<your api key>"
+ # -DINIT_MODE=always  // allow load keys in data.sql (for the first time). then need to chanege to "never" in spring.sql.init.mode property  to avoid duplicate key viloation
+ # -DAPPLICATION_WEATHERMAPAPIKEY=<apiid>  //contain valid apiid for openweather service ( need to obtain from the service)
+ # you can get rid of the  -Dspring-boot.run.jvmArguments and add correct values to the application.yml file
+ ./mvnw  spring-boot:run -Dspring-boot.run.jvmArguments="-DAPPLICATION_WEATHERMAPAPIKEY=<your api key> -DINIT_MODE=always"
 
 ```
-or  you can update application.yml and run without -Dspring-boot.run.jvmArguments
+
+Request for testing (postman or browser)
+###### Five Valid api keys will be print on to the console
+```
+
+http://localhost:8080/api/weather/current?country=au&city=melbourne&api_key=ZFhObGNqSkFkMlZoZEdobGNpMWxlR0Z0Y0d4bExtTnZiUzVoZFE9PS4xNjMwOTE0OTc1NTQ2LjAuMUFBOUJBNjA0QzY1QTkzOUVDODY3NkFGQjNFMTc1OUY=
+
+```
 #### NOTES
 
-- relighting is done in really simple way and wont accurate when have lot of multiple request at time
-  need to use distribute in memory couple with with atomic counter type of implementation.  
-- remove the validation of country code to accommodate sample request (uk is not standard ISO code)
-- include api_key as part of the parameter instead of header variable for simplicity
+- Throttling is done in really simple way and won't be accurate when having multiple requests at time.
+  Need to use distribute in memory couple with with atomic counter type of implementation for accuracy.  
+- Remove the validation of country code to accommodate sample request (uk is not standard ISO code)
+- Include api_key as part of the parameter instead of header variable for simplicity
+- db will be persisted in ./h2-db folder (change the path in application.yml or pass as environment variable)
+- could use https://jsonapi.org for response. avoid it for simplicity.
 

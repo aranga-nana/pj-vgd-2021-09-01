@@ -57,9 +57,10 @@ public class ApplicationProperties {
     public String toString() {
         return "ApplicationProperties{" +
                 "throttle=" + throttle +
-                ", weatherMapApiKey='" + weatherMapApiKey + '\'' +
+                ", weatherMapApiKey='" + (weatherMapApiKey == null || weatherMapApiKey.contains("add api key")? "add api key": "**********")  + '\'' +
                 ", ttl=" + ttl +
                 ", apiBaseUrl='" + apiBaseUrl + '\'' +
+                ", salt='" + (salt != null ? "*****": "" )+ '\'' +
                 '}';
     }
 }
