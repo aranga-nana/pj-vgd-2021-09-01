@@ -1,5 +1,5 @@
 # TDD
-Like to get everyonce comments around sample TDD. (Structure / complexyty) 
+Like to get everyonce comments around sample this TDD following points structure / simplicity of the code.
 ### Requirements 
 
 1.An API Key is rate limited to 5 weather reports an hour. After that your service should respond in a way which communicates that the hourly limit has been exceeded. Create 5 API Keys. Pick a convention for handling them that you like; using simple string constants is fine. 
